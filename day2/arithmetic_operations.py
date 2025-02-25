@@ -1,48 +1,51 @@
 # Constants
-DIVISION_BY_ZERO_ERROR = "Error: Division by zero is not allowed."
+ERROR_MESSAGES = {
+    "DIVISION_BY_ZERO": "Error: Division by zero is not allowed."
+}
 
 
 # Arithmetic operations
-def add_numbers(a, b):
+def add(a, b):
     return a + b
 
 
-def subtract_numbers(a, b):
+def subtract(a, b):
     return a - b
 
 
-def multiply_numbers(a, b):
+def multiply(a, b):
     return a * b
 
 
-def divide_numbers(a, b):
-    if b == 0:
-        return DIVISION_BY_ZERO_ERROR
-    return a / b
+def divide(a, b):
+    return ERROR_MESSAGES["DIVISION_BY_ZERO"] if b == 0 else a / b
 
 
-def power_numbers(a, b):
+def power(a, b):
     return a ** b
 
 
-def modulo_numbers(a, b):
+def modulo(a, b):
     return a % b
 
 
-# Helper function for testing operations
-def test_operation(operation_name, func, x, y):
-    result = func(x, y)
-    print(f"{operation_name}: {x} and {y} = {result}")
+# Generalized function for performing operations
+def perform_operation(operation_func, a, b):
+    return operation_func(a, b)
 
 
-# Testing
+# Generalized testing
 if __name__ == "__main__":
+    operations = [
+        ("Addition", add),
+        ("Subtraction", subtract),
+        ("Multiplication", multiply),
+        ("Division", divide),
+        ("Division by Zero", lambda a, _: divide(a, 0)),  # Example with zero case
+        ("Power", power),
+        ("Modulo", modulo)
+    ]
     x, y = 10, 5
-
-    test_operation("Addition", add_numbers, x, y)
-    test_operation("Subtraction", subtract_numbers, x, y)
-    test_operation("Multiplication", multiply_numbers, x, y)
-    test_operation("Division", divide_numbers, x, y)
-    test_operation("Division by Zero", divide_numbers, x, 0)
-    test_operation("Power", power_numbers, x, y)
-    test_operation("Modulo", modulo_numbers, x, y)
+    for op_name, op_func in operations:
+        result = perform_operation(op_func, x, y)
+        print(f"{op_name}: {x} and {y} = {result}")
