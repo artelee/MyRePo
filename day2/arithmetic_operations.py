@@ -17,6 +17,15 @@ def divide(a, b):
     return a / b
 
 
+def power(a, b):
+    return a ** b
+
+def mod(a, b):
+    return a % b
+
+
+
+
 # 함수 테스트
 if __name__ == "__main__":
     # 테스트 값
@@ -36,3 +45,6 @@ if __name__ == "__main__":
 
     # 0으로 나누기 테스트
     print(f"{x} / 0 = {divide(x, 0)}")
+
+    print(f"{x} / 0 = {power(x, y)}")
+    print(f"{x} / 0 = {mod(x, y)}")
