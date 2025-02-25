@@ -1,50 +1,48 @@
-# 연산 함수 정의
-def add(a, b):
+# Constants
+DIVISION_BY_ZERO_ERROR = "Error: Division by zero is not allowed."
+
+
+# Arithmetic operations
+def add_numbers(a, b):
     return a + b
 
 
-def subtract(a, b):
+def subtract_numbers(a, b):
     return a - b
 
 
-def multiply(a, b):
+def multiply_numbers(a, b):
     return a * b
 
 
-def divide(a, b):
+def divide_numbers(a, b):
     if b == 0:
-        return "Error: Division by zero is not allowed."
+        return DIVISION_BY_ZERO_ERROR
     return a / b
 
 
-def power(a, b):
+def power_numbers(a, b):
     return a ** b
 
-def mod(a, b):
+
+def modulo_numbers(a, b):
     return a % b
 
 
+# Helper function for testing operations
+def test_operation(operation_name, func, x, y):
+    result = func(x, y)
+    print(f"{operation_name}: {x} and {y} = {result}")
 
 
-# 함수 테스트
+# Testing
 if __name__ == "__main__":
-    # 테스트 값
     x, y = 10, 5
 
-    # 더하기 테스트
-    print(f"{x} + {y} = {add(x, y)}")
-
-    # 빼기 테스트
-    print(f"{x} - {y} = {subtract(x, y)}")
-
-    # 곱하기 테스트
-    print(f"{x} * {y} = {multiply(x, y)}")
-
-    # 나누기 테스트
-    print(f"{x} / {y} = {divide(x, y)}")
-
-    # 0으로 나누기 테스트
-    print(f"{x} / 0 = {divide(x, 0)}")
-
-    print(f"{x} / 0 = {power(x, y)}")
-    print(f"{x} / 0 = {mod(x, y)}")
+    test_operation("Addition", add_numbers, x, y)
+    test_operation("Subtraction", subtract_numbers, x, y)
+    test_operation("Multiplication", multiply_numbers, x, y)
+    test_operation("Division", divide_numbers, x, y)
+    test_operation("Division by Zero", divide_numbers, x, 0)
+    test_operation("Power", power_numbers, x, y)
+    test_operation("Modulo", modulo_numbers, x, y)
