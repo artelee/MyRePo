@@ -8,7 +8,7 @@ image = cv2.imread("candies.png")
 hsv_image = cv2.cvtColor(image, cv2.COLOR_BGR2HSV)
 
 # 3. 빨간색 HSV 범위 설정
-# 빨간색은 Hue 값이 양 끝단(0~10, 160~180)에 걸쳐 있음
+# 빨간색은 Hue 값이 양 끝단(0~10, 160    ~180)에 걸쳐 있음
 lower_red1 = np.array([0, 120, 70])
 upper_red1 = np.array([10, 255, 255])
 lower_red2 = np.array([170, 120, 70])
