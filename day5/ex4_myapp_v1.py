@@ -89,61 +89,100 @@ class WindowClass(QMainWindow, form_class):
         self.isOK = False
 
     def update_frame(self):
-        # TODO: cameraLabel(QLabel) 위젯에 OpenCV 카메라 모듈로부터 읽어온 영상 출력하기 (cap 변수 활용)
-        pass
+        # 카메라 프레임 가져오기
+        ret, frame = self.cap.read()
+        if not ret:
+            print("프레임을 읽어올 수 없습니다.")
+            return  # 프레임을 읽기 실패할 경우 반환
+
+        # BGR(OpenCV 기본) -> RGB(Pillow 및 PyQt 호환)
+        rgb_frame = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
+
+        # QImage로 변환
+        h, w, ch = rgb_frame.shape
+        bytes_per_line = ch * w
+        qt_image = QImage(rgb_frame.data, w, h, bytes_per_line, QImage.Format_RGB888)
+
+        # QLabel에 영상 출력
+        self.cameraLabel.setPixmap(QPixmap.fromImage(qt_image))
 
     def closeEvent(self, event):
-        # TODO: 창 종료시 카메라 릴리즈 (cap 변수 release)
-        pass
+        # 창 종료 시 카메라 릴리즈 (cap 변수 release)
+        if self.cap.isOpened():
+            self.cap.release()
+        event.accept()
 
     def update_timer(self):
-        # TODO: 타이머 숫자를 00:00.00 형식으로 labelCredits (QLabel)의 텍스트에 출력
-        self.gametime += 10  # 10ms씩 증가
-        pass
+        # 타이머 숫자를 00:00.00 형식으로 labelCredits (QLabel)의 텍스트에 출력
+        self.gametime += 10  # 10ms 증가
+        minutes = (self.gametime // 60000) % 60
+        seconds = (self.gametime // 1000) % 60
+        milliseconds = (self.gametime // 10) % 100
+        formatted_time = f"{minutes:02}:{seconds:02}.{milliseconds:02}"
+        self.labelCredits.setText(formatted_time)
 
     def update_guide(self):
-        # TODO: 게임 가이드 상태머신 구현하기
+        # 게임 가이드 상태머신 구현
         if self.ongoing:
-            # TODO: 여기에 오버레이 위젯 (GuideTextLabel) 가리기 코드 작성
+            # 오버레이 위젯 (GuideTextLabel) 가리기
+            self.GuideTextLabel.hide()
 
             if self.cnt < 4:
-                self.GuideTextLabel.setStyleSheet("color: black; background-color: rgba(100, 100, 100, 100);")
-                self.GuideTextLabel.clear()
-
-                # TODO: 여기에 오버레이 위젯 (GuideTextLabel) 에 3/2/1 출력하는 코드 작성
-
+                # 오버레이 텍스트 초기화 및 스타일 적용
+                self.GuideTextLabel.setStyleSheet(
+                    "color: black; background-color: rgba(100, 100, 100, 100);"
+                )
+                self.GuideTextLabel.setText(str(3 - self.cnt))  # 3/2/1 출력
+                self.GuideTextLabel.show()
                 self.cnt += 1
 
             elif self.cnt < 5:
-                # TODO: 오버레이 위젯 텍스트 초기화 코드 작성
-                # TODO: 여기에 오버레이 위젯 (GuideTextLabel) 가리기 코드 작성
-
+                # 오버레이 텍스트 초기화 및 숨기기
+                self.GuideTextLabel.clear()
+                self.GuideTextLabel.hide()
                 self.cnt += 1
 
             elif self.cnt < 6:
                 # face emotion recognition & comparison
-                # TODO 1: 카메라로부터 영상 읽어오기
-                # TODO 2: DeepFace.analyze 모듈 활용하여 얼굴 감정 인식 -> ret 변수에 'dominant_emotion' 값 저장
-                # TODO 3: 현재 문제와 ret 변수에 저장된 값 비교 및 결과에 따라 isOK 변수 업데이트
+                # 1. 카메라로부터 영상 읽어오기
+                ret, frame = self.cap.read()
+                if not ret:
+                    print("카메라 프레임을 가져오지 못했습니다.")
+                    return
 
+                # 2. DeepFace.analyze 활용 -> dominant_emotion 값 저장
+                try:
+                    objs = DeepFace.analyze(
+                        img_path=frame, actions=["emotion"], enforce_detection=False
+                    )
+                    dominant_emotion = objs[0]["dominant_emotion"]
+                    print(f"Detected Emotion: {dominant_emotion}")
+                except Exception as e:
+                    dominant_emotion = None
+                    print(f"DeepFace 분석 중 오류 발생: {e}")
+
+                # 3. 현재 문제와 dominant_emotion 비교 -> isOK 상태 업데이트
+                self.isOK = dominant_emotion == self.current_question_emotion
                 self.cnt += 1
 
             elif self.cnt < 7:
-                # TODO: 여기에 오버레이 위젯 (GuideTextLabel) 보이기 코드 작성
+                # 오버레이 위젯 (GuideTextLabel) 보이기
+                self.GuideTextLabel.show()
 
                 if self.isOK:
-                    # TODO: 여기에 오버레이 위젯 (GuideTextLabel)의 style 변경 코드 작성 (성공 시, text 색상 green)
-                    #       힌트 ("color: green; background-color: rgba(100, 100, 100, 100);")
-                    # TODO: 여기에 오버레이 위젯 (GuideTextLabel)의 텍스트를 "O"로 업데이트하는 코드 작성
-                    # TODO: 여기에 게임 상태 변경을 위한 함수 호출
-                    pass
-
+                    # 성공한 경우
+                    self.GuideTextLabel.setStyleSheet(
+                        "color: green; background-color: rgba(100, 100, 100, 100);"
+                    )
+                    self.GuideTextLabel.setText("O")
+                    # 게임 상태 변경 함수 호출 (예: self.next_question())
+                    self.next_question()
                 else:
-                    # TODO: 여기에 오버레이 위젯 (GuideTextLabel)의 style 변경 코드 작성 (성공 시, text 색상 red)
-                    #       힌트 ("color: red; background-color: rgba(100, 100, 100, 100);")
-                    # TODO: 여기에 오버레이 위젯 (GuideTextLabel)의 텍스트를 "X"로 업데이트하는 코드 작성
-                    pass
-
+                    # 실패한 경우
+                    self.GuideTextLabel.setStyleSheet(
+                        "color: red; background-color: rgba(100, 100, 100, 100);"
+                    )
+                    self.GuideTextLabel.setText("X")
                 self.cnt += 1
             else:
                 self.cnt = 1

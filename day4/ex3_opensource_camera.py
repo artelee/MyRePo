@@ -17,32 +17,35 @@ while True:
     break
 
   image = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
+  try:
+    objs = DeepFace.analyze(
+      img_path =image,
+      actions = ['age', 'gender', 'race', 'emotion'],
+    )
+    objs = objs[0]
+    print(objs)
 
-  objs = DeepFace.analyze(
-    img_path =image,
-    actions = ['age', 'gender', 'race', 'emotion'],
-  )
-  objs = objs[0]
-  print(objs)
+    # 출력할 텍스트 추가
+    text = ("age: {}, gender: {}, race: {}, emotion: {}".format(
+      objs['age'], objs['dominant_gender'], objs['dominant_race'], objs['dominant_emotion']))
+    font = cv2.FONT_HERSHEY_SIMPLEX  # 폰트 종류
+    font_scale = 0.7  # 폰트 크기
+    color = (0, 0, 255)  # 초록색 (B, G, R 순)
+    thickness = 2  # 두께
+    org = (10, frame.shape[0] - 10)  # 텍스트 위치 (좌측 하단)
 
-  # 출력할 텍스트 추가
-  text = ("age: {}, gender: {}, race: {}, emotion: {}".format(
-    objs['age'], objs['dominant_gender'], objs['dominant_race'], objs['dominant_emotion']))
-  font = cv2.FONT_HERSHEY_SIMPLEX  # 폰트 종류
-  font_scale = 0.7  # 폰트 크기
-  color = (0, 0, 255)  # 초록색 (B, G, R 순)
-  thickness = 2  # 두께
-  org = (10, frame.shape[0] - 10)  # 텍스트 위치 (좌측 하단)
+    # 텍스트를 프레임에 추가
+    cv2.putText(frame, text, org, font, font_scale, color, thickness, cv2.LINE_AA)
 
-  # 텍스트를 프레임에 추가
-  cv2.putText(frame, text, org, font, font_scale, color, thickness, cv2.LINE_AA)
+    # 디스플레이 윈도우에 프레임 표시
+    cv2.imshow('Camera Frame', frame)
 
-  # 디스플레이 윈도우에 프레임 표시
-  cv2.imshow('Camera Frame', frame)
+    # 'q' 키를 누르면 종료
+    if cv2.waitKey(1) & 0xFF == ord('q'):
+      break
 
-  # 'q' 키를 누르면 종료
-  if cv2.waitKey(1) & 0xFF == ord('q'):
-    break
+  except:
+    print("error")
 
 # 자원 해제
 cap.release()

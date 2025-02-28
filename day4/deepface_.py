@@ -1,4 +1,4 @@
-from deepface import DeepFace
+from deepface_ import DeepFace
 import cv2
 import matplotlib.pyplot as plt
 
